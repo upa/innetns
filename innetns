@@ -51,8 +51,11 @@ def main():
         ns for ns in nses if re.match(f'.*{args.netns}.*', ns, flags=re.IGNORECASE)
     ]
     if len(candidates) > 1:
-        print("There are multiple candidates:")
-        print("\n".join(candidates))
+        pr_err("There are multiple candidates:")
+        pr_err("\n".join(candidates))
+        sys.exit(1)
+    if len(candidates) == 0:
+        pr_err("no namespace mathced")
         sys.exit(1)
 
     # ok, we now identify a single target namespace, run the command
