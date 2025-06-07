@@ -59,8 +59,16 @@ rtt min/avg/max/mdev = 4.553/4.712/4.998/0.202 ms
 
 ```
 $ innetns NOC
-There are multiple candidates namespaces:
+There are multiple candidates:
 NOC_v1003
 NOC_v1004
 NOC_v1005
+```
+
+
+Install:
+
+```
+git clone https://github.com/upa/inetns
+cd inetns && sudo make install
 ```
