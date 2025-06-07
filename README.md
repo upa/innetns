@@ -35,7 +35,7 @@ NOC_v1005
 * Enter a network namespace
 
 ```
-$ ./innetns 1003
+$ innetns 1003
 [sudo] password for upa: 
 $
 # Now the shell is in network namespace NOC_v1003
@@ -55,7 +55,8 @@ PING 1.1.1.1 (1.1.1.1) 56(84) bytes of data.
 rtt min/avg/max/mdev = 4.553/4.712/4.998/0.202 ms
 ```
 
-* When [netns] string cannot deteremine a single traget netns:
+* When `[netns]` argument cannot deteremine a single traget netns, it
+  lists candidate namespaces.
 
 ```
 $ innetns NOC
