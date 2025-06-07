@@ -1,0 +1,83 @@
+#!/usr/bin/env python3
+
+import subprocess
+import argparse
+import getpass
+import sys
+import re
+
+def pr_err(msg):
+    print(msg, file=sys.stderr)
+
+_VERBOSE = False
+def pr_v(msg):
+    if _VERBOSE:
+        pr_err(msg)
+    
+
+def main():
+
+    desc = "netnsin: execute command in netns"
+
+    parser = argparse.ArgumentParser(description=desc)
+    parser.add_argument("netns", default=None, nargs="?",
+                        help="string to identify a network namespace")
+    parser.add_argument("command", default=["su", getpass.getuser()], nargs="*",
+                        help="command to execute in netns (default is `su [USER]`)")
+    parser.add_argument("-l", "--list", action="store_true",
+                        help="list network namespaces")
+    parser.add_argument("-s", "--wo-sudo", action="store_true",
+                        help="call `ip netns exec` without sudo")
+    parser.add_argument("-v", "--verbose" ,action="store_true",
+                        help="enable verbose output")
+
+    args, cmd_args= parser.parse_known_args()
+
+    global _VERBOSE
+    _VERBOSE = args.verbose
+
+    if args.list:
+        nses = netns_list()
+        print("\n".join(nses))
+        sys.exit(0)
+
+    if not args.netns:
+        parser.print_help()
+        sys.exit(1)
+
+    # ok, identifier for the target netns is specified, pick it up
+    nses = netns_list()
+    candidates = [
+        ns for ns in nses if re.match(f'.*{args.netns}.*', ns, flags=re.IGNORECASE)
+    ]
+    if len(candidates) > 1:
+        print("There are multiple candidates namespaces:")
+        print("\n".join(candidates))
+        sys.exit(1)
+
+    # ok, we now identify a single target namespace, run the command
+    ipnetnsexec = ["ip", "netns", "exec", candidates[0]]
+    if not args.wo_sudo:
+        ipnetnsexec.insert(0, "sudo")
+    cmd = ipnetnsexec + args.command + cmd_args
+    pr_v(f"Command: {cmd}")
+    subprocess.run(cmd)
+
+
+def netns_list() -> list[str]:
+    try:
+        out = subprocess.check_output(["ip", "netns", "list"])
+    except Exception as e:
+        pr_err(f"failed to get netns list: {e}")
+        sys.exit(1)
+        
+    nses:list[str] = []
+
+    for line in out.decode().strip().split("\n"):
+        netns = re.split(r'\s+', line)[0]
+        nses.append(netns)
+
+    return sorted(nses)
+
+if __name__ == "__main__":
+    main()
