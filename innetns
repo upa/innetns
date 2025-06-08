@@ -17,7 +17,7 @@ def pr_v(msg):
 
 def main():
 
-    desc = "netnsin: execute command in netns"
+    desc = "Execute commands in network namespaces simply"
 
     parser = argparse.ArgumentParser(description=desc)
     parser.add_argument("netns", default=None, nargs="?",
