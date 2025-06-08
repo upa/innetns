@@ -9,7 +9,7 @@ Usage:
 $ innetns
 usage: innetns [-h] [-l] [-s] [netns] [command ...]
 
-netnsin: execute command in netns
+Execute commands in network namespaces simply
 
 positional arguments:
   netns          string to identify a network namespace
